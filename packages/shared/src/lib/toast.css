@@ -1,0 +1,23 @@
+/* Shared helper — the same file is copied into each homeassistant-* card repo. Keep the copies identical. */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translate(-50%, 12px);
+  opacity: 0;
+  transition: all 0.25s;
+  background: var(--primary-text-color);
+  color: var(--card-background-color, #fff);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.85em;
+  max-width: 85%;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: var(--toast-shadow, none);
+
+  &.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

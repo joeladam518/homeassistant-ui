@@ -1,0 +1,87 @@
+.bc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.bc-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+
+  & ha-icon {
+    color: var(--primary-color);
+  }
+}
+
+.targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.target {
+  & ha-icon {
+    --mdc-icon-size: 16px;
+    margin-left: -4px;
+  }
+
+  &.offline {
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+}
+
+.bc-row {
+  display: flex;
+  gap: 8px;
+
+  & input {
+    flex: 1;
+    font-size: 1.05em;
+    padding: 12px 14px;
+  }
+}
+
+.bc-opts {
+  display: flex;
+  align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin: 10px 0 4px;
+
+  & .small-in {
+    width: 90px;
+  }
+
+  & select {
+    padding: 7px 10px;
+  }
+}
+
+.spacer {
+  flex: 1;
+}
+
+.recent {
+  margin-top: 8px;
+
+  & .chip-btn {
+    max-width: 30%;
+  }
+}
+
+@media (max-width: 500px) {
+  .recent .chip-btn {
+    max-width: 48%;
+  }
+
+  .spacer {
+    display: none;
+  }
+}

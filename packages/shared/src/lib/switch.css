@@ -1,0 +1,43 @@
+/* Shared helper — the same file is copied into each homeassistant-* card repo. Keep the copies identical.
+ *
+ * <button class="switch on"><span></span></button>
+ * Size it with --switch-width, --switch-pad and --switch-knob; colour it with --switch-on-color / --switch-off-color.
+ */
+.switch {
+  --_w: var(--switch-width, 58px);
+  --_pad: var(--switch-pad, 4px);
+  --_knob: var(--switch-knob, 26px);
+  width: var(--_w);
+  height: calc(var(--_knob) + 2 * var(--_pad));
+  box-sizing: border-box;
+  border: none;
+  border-radius: 999px;
+  padding: var(--_pad);
+  flex: none;
+  cursor: pointer;
+  background: var(--switch-off-color, var(--disabled-text-color, #8a8a8a));
+  transition: background 0.2s;
+
+  & span {
+    display: block;
+    width: var(--_knob);
+    height: var(--_knob);
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  &.on {
+    background: var(--switch-on-color, var(--primary-color));
+  }
+
+  &.on span {
+    transform: translateX(calc(var(--_w) - 2 * var(--_pad) - var(--_knob)));
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}

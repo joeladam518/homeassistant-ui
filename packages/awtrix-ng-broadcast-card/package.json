@@ -1,0 +1,11 @@
+{
+  "name": "awtrix-ng-broadcast-card",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AWTRIX NG \"Message all clocks\" card: one message box that sends to several clocks.",
+  "type": "module",
+  "dependencies": {
+    "@homeassistant-ui/shared": "*",
+    "lit": "^3.3.3"
+  }
+}
