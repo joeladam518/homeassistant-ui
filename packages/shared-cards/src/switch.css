@@ -1,4 +1,4 @@
-/* Shared helper — the same file is copied into each homeassistant-* card repo. Keep the copies identical.
+/* Toggle switch.
  *
  * <button class="switch on"><span></span></button>
  * Size it with --switch-width, --switch-pad and --switch-knob; colour it with --switch-on-color / --switch-off-color.

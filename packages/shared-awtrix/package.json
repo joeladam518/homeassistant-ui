@@ -1,0 +1,14 @@
+{
+  "name": "@joeladam518/shared-awtrix",
+  "version": "0.0.0",
+  "private": true,
+  "description": "AWTRIX helpers and styles shared by the AWTRIX cards here. Bundled into each card; never deployed on its own.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@joeladam518/shared-cards": "*"
+  }
+}

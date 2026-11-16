@@ -1,4 +1,4 @@
-import { entity, type FakeHass, fakeHass } from "@homeassistant-ui/shared/awtrix/test-helpers.ts";
+import { entity, type FakeHass, fakeHass } from "@joeladam518/shared-awtrix/test-helpers.ts";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { AwtrixNgAlarmCard } from "./alarm-card.ts";

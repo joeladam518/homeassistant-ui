@@ -1,7 +1,7 @@
 {
   "name": "homeassistant-ui",
   "private": true,
-  "description": "My private Home Assistant frontend bits: cards I use myself and don't publish.",
+  "description": "My Home Assistant cards that aren't on the Marketplace, plus the helpers shared with my public card repos.",
   "license": "UNLICENSED",
   "author": "Joel Haker",
   "workspaces": [

@@ -1,4 +1,3 @@
-// Shared helper — the same file is copied into each homeassistant-* card repo. Keep the copies identical.
 import type { Connection, HassConfig, HassEntity, HassServiceTarget } from "home-assistant-js-websocket";
 
 /** An entity state. `last_reported` is newer than the types in home-assistant-js-websocket. */

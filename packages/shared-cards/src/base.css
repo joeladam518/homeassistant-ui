@@ -1,0 +1,12 @@
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}

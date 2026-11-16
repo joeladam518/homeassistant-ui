@@ -1,0 +1,35 @@
+name: Publish shared-cards
+
+# Push a tag shared-cards-v<version> and this publishes packages/shared-cards to GitHub Packages.
+on:
+  push:
+    tags: ["shared-cards-v*"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: "@joeladam518"
+      - run: npm ci
+      - name: Tag matches package.json version
+        run: |
+          version="shared-cards-v$(node -p 'require("./packages/shared-cards/package.json").version')"
+          if [ "$version" != "${{ github.ref_name }}" ]; then
+            echo "Tag ${{ github.ref_name }} doesn't match packages/shared-cards/package.json ($version)"
+            exit 1
+          fi
+      # typecheck, lint, format check, build, tests
+      - run: npm run check
+      - run: npm publish -w packages/shared-cards
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

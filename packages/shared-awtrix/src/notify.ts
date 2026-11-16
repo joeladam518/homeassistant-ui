@@ -1,4 +1,4 @@
-import { lsGet, lsSet } from "../lib/storage.ts";
+import { lsGet, lsSet } from "@joeladam518/shared-cards/storage.ts";
 
 export const DURATIONS = [
   { label: "5 s", ms: 5000 },

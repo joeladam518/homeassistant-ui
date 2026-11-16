@@ -1,4 +1,4 @@
-import { defineOnce, logVersion, registerCard } from "@homeassistant-ui/shared/lib/register.ts";
+import { defineOnce, logVersion, registerCard } from "@joeladam518/shared-cards/register.ts";
 
 import { AwtrixNgBroadcastCard } from "./broadcast-card.ts";
 

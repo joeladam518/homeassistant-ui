@@ -1,0 +1,12 @@
+{
+  "name": "rgb-light-card",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Colour light card: a drag-to-pick colour wheel, brightness, favourite colours, effects, extra switches and button inputs.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "dependencies": {
+    "@joeladam518/shared-cards": "*",
+    "lit": "^3.3.3"
+  }
+}

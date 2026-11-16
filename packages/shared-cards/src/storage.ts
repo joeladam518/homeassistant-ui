@@ -1,5 +1,3 @@
-// Shared helper — the same file is copied into each homeassistant-* card repo. Keep the copies identical.
-
 /** Read JSON from localStorage, or `fallback` if it's missing, broken or storage is blocked. */
 export function lsGet<T>(key: string, fallback: T): T {
   try {

@@ -1,4 +1,4 @@
-import { entity, type FakeHass, fakeHass, flush } from "@homeassistant-ui/shared/awtrix/test-helpers.ts";
+import { entity, type FakeHass, fakeHass, flush } from "@joeladam518/shared-awtrix/test-helpers.ts";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import type { AwtrixNgBroadcastCard } from "./broadcast-card.ts";

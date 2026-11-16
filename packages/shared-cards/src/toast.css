@@ -1,4 +1,3 @@
-/* Shared helper — the same file is copied into each homeassistant-* card repo. Keep the copies identical. */
 .toast {
   position: absolute;
   left: 50%;

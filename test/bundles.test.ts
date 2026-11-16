@@ -13,4 +13,11 @@ describe("dist bundles", () => {
     await import("../dist/awtrix-ng-broadcast-card.js");
     expect(customElements.get("awtrix-ng-broadcast-card")).toBeDefined();
   });
+
+  it("rgb-light-card.js defines the RGB light card", async () => {
+    // @ts-expect-error -- the built file has no type declarations
+    await import("../dist/rgb-light-card.js");
+    expect(customElements.get("rgb-light-card")).toBeDefined();
+    expect(window.customCards?.map((c) => c.type)).toContain("rgb-light-card");
+  });
 });

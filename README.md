@@ -1,14 +1,18 @@
 # homeassistant-ui
 
-**My private Home Assistant frontend bits**: cards I use myself and don't publish. Anything worth sharing gets its own public `homeassistant-*` repo instead, since the Marketplace allows one item per repo.
+**My Home Assistant frontend bits that aren't on the Marketplace**: cards I use myself, plus the helpers shared with my public `homeassistant-*` card repos.
+
+The repo is public so the shared helpers can be. Only `shared-cards` is licensed for reuse, though; see [License](#license).
 
 ## Packages
 
-| Package                                                          | Builds                             | `type:`                           | Version |
-| ---------------------------------------------------------------- | ---------------------------------- | --------------------------------- | ------- |
-| [`awtrix-ng-alarm-card`](packages/awtrix-ng-alarm-card/)         | `dist/awtrix-ng-alarm-card.js`     | `custom:awtrix-ng-alarm-card`     | 1.0.0   |
-| [`awtrix-ng-broadcast-card`](packages/awtrix-ng-broadcast-card/) | `dist/awtrix-ng-broadcast-card.js` | `custom:awtrix-ng-broadcast-card` | 1.0.0   |
-| [`shared`](packages/shared/)                                     | nothing; bundled into the others   |                                   |         |
+| Package                                                          | What it is                                    | Builds / publishes                             | Version |
+| ---------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------- | ------- |
+| [`awtrix-ng-alarm-card`](packages/awtrix-ng-alarm-card/)         | Card, `type: custom:awtrix-ng-alarm-card`     | `dist/awtrix-ng-alarm-card.js`                 | 1.0.0   |
+| [`awtrix-ng-broadcast-card`](packages/awtrix-ng-broadcast-card/) | Card, `type: custom:awtrix-ng-broadcast-card` | `dist/awtrix-ng-broadcast-card.js`             | 1.0.0   |
+| [`rgb-light-card`](packages/rgb-light-card/)                     | Card, `type: custom:rgb-light-card`           | `dist/rgb-light-card.js`                       | 2.0.0   |
+| [`shared-cards`](packages/shared-cards/)                         | Helpers for every card, here and public       | `@joeladam518/shared-cards` on GitHub Packages | 1.0.0   |
+| [`shared-awtrix`](packages/shared-awtrix/)                       | AWTRIX helpers for the AWTRIX cards here      | nothing; bundled into the cards                |         |
 
 ## Develop
 
@@ -16,16 +20,16 @@ Needs Node 22+. Everything runs from the root.
 
 ```sh
 npm install
-npm run build                              # every package → dist/<package>.js
-PKG=awtrix-ng-alarm-card npm run build     # just one
+npm run build                              # every card → dist/<package>.js
+PKG=rgb-light-card npm run build           # just one
 npm run watch                              # rebuild on every change
 npm run check                              # typecheck, lint, format check, build, tests
 npm run fmt                                # format everything
 ```
 
 - **Code:** TypeScript + [Lit](https://lit.dev), styles in `*.css` (PostCSS), built with [rolldown](https://rolldown.rs). Each card is one self-contained file with Lit included.
-- **Shared code** lives in `packages/shared` and is imported as `@homeassistant-ui/shared/<path>`, e.g. `@homeassistant-ui/shared/lib/toast.ts`. Its `lib/` matches the `src/lib/` in the public card repos.
-- **No CI.** Builds are local, when needed.
+- **Shared code** is imported by file, e.g. `@joeladam518/shared-cards/toast.ts` or `@joeladam518/shared-awtrix/mqtt.ts`. Here they're workspace links, so changes show up straight away.
+- **CI** only publishes `shared-cards` (see its [README](packages/shared-cards/README.md#release)). Card builds are local.
 
 ## Deploy a card
 
@@ -33,8 +37,13 @@ npm run fmt                                # format everything
 2. Copy `dist/<package>.js` to `/config/www/` (File editor works).
 3. Bump `?v=` on the resource (**Settings → Dashboards → ⋮ → Resources**) to the package's version, then hard-refresh.
 
-## Add a package
+## Add a card
 
-1. Create `packages/<name>/` with a `package.json` (`name`, `version`, `"private": true`, and dependencies on `lit` and `@homeassistant-ui/shared`).
+1. Create `packages/<name>/` with a `package.json`: `name`, `version`, `"private": true`, `"license": "UNLICENSED"`, and dependencies on `lit` and `@joeladam518/shared-cards`.
 2. Add `src/index.ts`, which defines the element(s) and calls `registerCard` and `logVersion(…, __VERSION__, …)`.
 3. Run `npm install`. The build, typecheck, lint and tests pick it up automatically.
+
+## License
+
+- **`packages/shared-cards`:** MIT. See its [LICENSE](packages/shared-cards/LICENSE).
+- **Everything else:** all rights reserved (`UNLICENSED`). It's public to read, not to reuse.

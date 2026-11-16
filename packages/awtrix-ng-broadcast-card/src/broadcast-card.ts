@@ -3,7 +3,7 @@ import {
   publish,
   subscribeTopic,
   type Unsubscribe,
-} from "@homeassistant-ui/shared/awtrix/mqtt.ts";
+} from "@joeladam518/shared-awtrix/mqtt.ts";
 import {
   buildNotify,
   DEFAULT_DURATION_MS,
@@ -11,20 +11,20 @@ import {
   loadRecent,
   type RecentMessage,
   saveRecent,
-} from "@homeassistant-ui/shared/awtrix/notify.ts";
-import { lsGet, lsSet } from "@homeassistant-ui/shared/lib/storage.ts";
-import { ToastController } from "@homeassistant-ui/shared/lib/toast.ts";
+} from "@joeladam518/shared-awtrix/notify.ts";
+import { lsGet, lsSet } from "@joeladam518/shared-cards/storage.ts";
+import { ToastController } from "@joeladam518/shared-cards/toast.ts";
 import type {
   HomeAssistant,
   LovelaceCardConfig,
   LovelaceGridOptions,
-} from "@homeassistant-ui/shared/lib/types.ts";
+} from "@joeladam518/shared-cards/types.ts";
 import { html, LitElement, nothing, unsafeCSS } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 
 import broadcastCss from "./broadcast.css?inline";
-import commonCss from "@homeassistant-ui/shared/awtrix/common.css?inline";
-import toastCss from "@homeassistant-ui/shared/lib/toast.css?inline";
+import commonCss from "@joeladam518/shared-awtrix/common.css?inline";
+import toastCss from "@joeladam518/shared-cards/toast.css?inline";
 
 type ClockRef = string | { prefix: string; name?: string };
 

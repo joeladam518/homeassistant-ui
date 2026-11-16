@@ -1,10 +1,10 @@
-import { ToastController } from "@homeassistant-ui/shared/lib/toast.ts";
+import { ToastController } from "@joeladam518/shared-cards/toast.ts";
 import type {
   EntityState,
   HomeAssistant,
   LovelaceCardConfig,
   LovelaceGridOptions,
-} from "@homeassistant-ui/shared/lib/types.ts";
+} from "@joeladam518/shared-cards/types.ts";
 import { html, LitElement, noChange, nothing, unsafeCSS } from "lit";
 import { live } from "lit/directives/live.js";
 
@@ -22,9 +22,9 @@ import {
 } from "./alarms.ts";
 
 import alarmCss from "./alarm.css?inline";
-import commonCss from "@homeassistant-ui/shared/awtrix/common.css?inline";
-import switchCss from "@homeassistant-ui/shared/lib/switch.css?inline";
-import toastCss from "@homeassistant-ui/shared/lib/toast.css?inline";
+import commonCss from "@joeladam518/shared-awtrix/common.css?inline";
+import switchCss from "@joeladam518/shared-cards/switch.css?inline";
+import toastCss from "@joeladam518/shared-cards/toast.css?inline";
 
 /** The Home Assistant helpers, scripts and automation the alarm card works with. */
 export const ALARM_DEFAULTS = {

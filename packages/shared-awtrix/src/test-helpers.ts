@@ -1,6 +1,6 @@
+import type { HomeAssistant } from "@joeladam518/shared-cards/types.ts";
 import { vi } from "vitest";
 
-import type { HomeAssistant } from "../lib/types.ts";
 import type { MqttMessage } from "./mqtt.ts";
 
 export const entity = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({

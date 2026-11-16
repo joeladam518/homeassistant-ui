@@ -1,4 +1,3 @@
-// Shared helper — the same file is copied into each homeassistant-* card repo. Keep the copies identical.
 import type { CustomCardEntry } from "./types.ts";
 
 /** Define a custom element unless another copy of this file already did. */

@@ -1,0 +1,38 @@
+{
+  "name": "@joeladam518/shared-cards",
+  "version": "1.0.0",
+  "description": "Helpers and styles shared by Joel's Home Assistant cards: card registration, HA types, formatting, sparklines, statistics, toasts and switch styles.",
+  "keywords": [
+    "card",
+    "dashboard",
+    "home-assistant",
+    "lovelace"
+  ],
+  "license": "MIT",
+  "author": "Joel Haker",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joeladam518/homeassistant-ui.git",
+    "directory": "packages/shared-cards"
+  },
+  "files": [
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "type": "module",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "peerDependencies": {
+    "home-assistant-js-websocket": "^9.8.1",
+    "lit": "^3.3.3"
+  },
+  "peerDependenciesMeta": {
+    "home-assistant-js-websocket": {
+      "optional": true
+    }
+  }
+}

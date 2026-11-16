@@ -1,4 +1,3 @@
-// Shared helper — the same file is copied into each homeassistant-* card repo. Keep the copies identical.
 import { html, type ReactiveController, type ReactiveControllerHost, type TemplateResult } from "lit";
 
 /**

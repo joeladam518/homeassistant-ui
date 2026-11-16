@@ -1,4 +1,4 @@
-import type { HomeAssistant } from "../lib/types.ts";
+import type { HomeAssistant } from "@joeladam518/shared-cards/types.ts";
 
 export interface MqttMessage {
   topic: string;
