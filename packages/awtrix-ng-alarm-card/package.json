@@ -1,6 +1,6 @@
 {
   "name": "awtrix-ng-alarm-card",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "AWTRIX NG alarm clock card: alarms with days and sounds, stored in Home Assistant helpers.",
   "license": "UNLICENSED",

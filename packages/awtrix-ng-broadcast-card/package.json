@@ -1,6 +1,6 @@
 {
   "name": "awtrix-ng-broadcast-card",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "AWTRIX NG \"Message all clocks\" card: one message box that sends to several clocks.",
   "license": "UNLICENSED",
