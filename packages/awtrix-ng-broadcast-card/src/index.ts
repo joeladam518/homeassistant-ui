@@ -1,8 +1,8 @@
 import { defineOnce, logVersion, registerCard } from "@joeladam518/shared-cards/register.ts";
 
-import { AwtrixNgBroadcastCard } from "./broadcast-card.ts";
+import { AwtrixNgBroadcastCardElement } from "./broadcast-card.tsx";
 
-defineOnce("awtrix-ng-broadcast-card", AwtrixNgBroadcastCard);
+defineOnce("awtrix-ng-broadcast-card", AwtrixNgBroadcastCardElement);
 
 registerCard({
   type: "awtrix-ng-broadcast-card",

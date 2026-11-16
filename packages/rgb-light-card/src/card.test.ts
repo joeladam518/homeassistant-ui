@@ -1,4 +1,4 @@
-import { flush } from "@joeladam518/shared-cards/testing.ts";
+import { act, flush } from "@joeladam518/shared-cards/testing.ts";
 import type { HomeAssistant } from "@joeladam518/shared-cards/types.ts";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -51,10 +51,11 @@ function fakeHass(light: Record<string, unknown> = {}, state = "on"): HomeAssist
 
 async function mount(config: Record<string, unknown> = {}, hass = fakeHass()): Promise<RgbLightCard> {
   const card = document.createElement("rgb-light-card") as RgbLightCard;
-  card.setConfig({ type: "custom:rgb-light-card", entity: "light.tree", ...config });
-  card.hass = hass;
-  document.body.append(card);
-  await flush();
+  await act(() => {
+    card.setConfig({ type: "custom:rgb-light-card", entity: "light.tree", ...config });
+    card.hass = hass;
+    document.body.append(card);
+  });
   return card;
 }
 

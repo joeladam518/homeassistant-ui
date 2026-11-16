@@ -18,6 +18,8 @@ export function linePath(points: Point[], x: (t: number) => number, y: (v: numbe
 export function areaPath(line: string, points: Point[], x: (t: number) => number, bottom: number): string {
   const first = points[0];
   const last = points[points.length - 1];
-  if (!line || !first || !last) return "";
+  if (!line || !first || !last) {
+    return "";
+  }
   return `${line}L${x(last.t).toFixed(1)},${bottom}L${x(first.t).toFixed(1)},${bottom}Z`;
 }

@@ -19,15 +19,20 @@ export function useNow(ms: number): number {
 }
 
 /**
- * The value an input should show: `value`, unless the user is typing in it or dragging it.
- * Then it keeps what the user has entered, so a state update doesn't jump it back.
+ * The `value` for an input marked `data-k={key}`: `undefined` (leave it alone) while the user is
+ * in that input, or when there's no value yet. Otherwise the value as a string.
+ * Stops incoming state from jumping an input back while someone is typing or dragging.
  *
- * `const ref = useRef<HTMLInputElement>(null)` → `<input ref={ref} value={heldValue(ref.current, v)} />`
+ * `<input data-k="vol" value={heldValue(host.shadowRoot, "vol", volume)} />`
  */
-export function heldValue(el: HTMLInputElement | HTMLTextAreaElement | null, value: unknown): string {
-  const root = el?.getRootNode() as Document | ShadowRoot | undefined;
-  if (el && root?.activeElement === el) {
-    return el.value;
+export function heldValue(
+  root: DocumentOrShadowRoot | null,
+  key: string,
+  value: unknown,
+): string | undefined {
+  const focused = root?.activeElement as HTMLElement | null | undefined;
+  if (value == null || focused?.dataset?.k === key) {
+    return undefined;
   }
-  return value == null ? "" : String(value);
+  return String(value);
 }

@@ -1,8 +1,8 @@
 import { defineOnce, logVersion, registerCard } from "@joeladam518/shared-cards/register.ts";
 
-import { AwtrixNgAlarmCard } from "./alarm-card.ts";
+import { AwtrixNgAlarmCardElement } from "./alarm-card.tsx";
 
-defineOnce("awtrix-ng-alarm-card", AwtrixNgAlarmCard);
+defineOnce("awtrix-ng-alarm-card", AwtrixNgAlarmCardElement);
 
 registerCard({
   type: "awtrix-ng-alarm-card",

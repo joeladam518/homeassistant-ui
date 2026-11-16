@@ -22,7 +22,9 @@ export const isWhiteFavorite = (f: Favorite): boolean => String(f.color).toLower
 
 export function hexToRgb(hex: string): Rgb | null {
   const m = /^#?([0-9a-f]{6})$/i.exec(String(hex).trim());
-  if (!m) return null;
+  if (!m) {
+    return null;
+  }
   const n = parseInt(m[1]!, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
@@ -44,11 +46,17 @@ export function rgbToHs([r, g, b]: Rgb): [number, number] {
   const d = max - Math.min(rr, gg, bb);
   let h = 0;
   if (d) {
-    if (max === rr) h = ((gg - bb) / d) % 6;
-    else if (max === gg) h = (bb - rr) / d + 2;
-    else h = (rr - gg) / d + 4;
+    if (max === rr) {
+      h = ((gg - bb) / d) % 6;
+    } else if (max === gg) {
+      h = (bb - rr) / d + 2;
+    } else {
+      h = (rr - gg) / d + 4;
+    }
     h *= 60;
-    if (h < 0) h += 360;
+    if (h < 0) {
+      h += 360;
+    }
   }
   return [h, max ? (d / max) * 100 : 0];
 }
@@ -59,10 +67,16 @@ export const favoriteRgb = (f: Favorite): Rgb =>
 
 /** Is the light showing this favourite? Colours match when hue and saturation are close. */
 export function favoriteMatches(f: Favorite, current: Rgb | "white" | null): boolean {
-  if (current === "white") return isWhiteFavorite(f);
-  if (!current || isWhiteFavorite(f)) return false;
+  if (current === "white") {
+    return isWhiteFavorite(f);
+  }
+  if (!current || isWhiteFavorite(f)) {
+    return false;
+  }
   const fav = hexToRgb(f.color);
-  if (!fav) return false;
+  if (!fav) {
+    return false;
+  }
   const [h1, s1] = rgbToHs(fav);
   const [h2, s2] = rgbToHs(current);
   const dh = Math.min(Math.abs(h1 - h2), 360 - Math.abs(h1 - h2));

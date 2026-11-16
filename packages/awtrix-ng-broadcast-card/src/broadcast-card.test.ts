@@ -1,7 +1,8 @@
-import { entity, type FakeHass, fakeHass, flush } from "@joeladam518/shared-awtrix/test-helpers.ts";
+import { entity, type FakeHass, fakeHass, flush as tick } from "@joeladam518/shared-awtrix/test-helpers.ts";
+import { act, flush } from "@joeladam518/shared-cards/testing.ts";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import type { AwtrixNgBroadcastCard } from "./broadcast-card.ts";
+import type { AwtrixNgBroadcastCardElement as AwtrixNgBroadcastCard } from "./broadcast-card.tsx";
 
 beforeAll(async () => {
   await import("./index.ts");
@@ -16,11 +17,13 @@ const prefixSensors = () => ({
 
 async function mount(hass: FakeHass, config: Record<string, unknown> = {}): Promise<AwtrixNgBroadcastCard> {
   const card = document.createElement("awtrix-ng-broadcast-card") as AwtrixNgBroadcastCard;
-  card.setConfig({ type: "custom:awtrix-ng-broadcast-card", ...config });
-  card.hass = hass;
-  document.body.append(card);
-  await flush();
-  await card.updateComplete;
+  await act(() => {
+    card.setConfig({ type: "custom:awtrix-ng-broadcast-card", ...config });
+    card.hass = hass;
+    document.body.append(card);
+  });
+  // let the MQTT subscriptions finish
+  await tick();
   return card;
 }
 
@@ -41,10 +44,10 @@ describe("awtrix-ng-broadcast-card", () => {
     const hass = fakeHass(prefixSensors());
     const card = await mount(hass, { clocks: [{ prefix: "clock1", name: "Kitchen" }, "clock2"] });
     targets(card)[1]!.click(); // deselect clock2
-    await card.updateComplete;
+    await flush();
     $<HTMLInputElement>(card, "#text").value = "Dinner!";
     $(card, ".bc-row .btn").click();
-    await card.updateComplete;
+    await flush();
     expect(hass.published().map(([topic]) => topic)).toEqual(["clock1/cmd/notify"]);
     expect($(card, ".toast").textContent!.trim()).toBe("Sent to Kitchen");
   });
@@ -53,7 +56,7 @@ describe("awtrix-ng-broadcast-card", () => {
     const hass = fakeHass(prefixSensors());
     const card = await mount(hass);
     hass.mqtt("clock2/availability", "offline");
-    await card.updateComplete;
+    await flush();
     expect(targets(card)[1]!.classList.contains("offline")).toBe(true);
   });
 
@@ -61,7 +64,7 @@ describe("awtrix-ng-broadcast-card", () => {
     const hass = fakeHass(prefixSensors());
     const card = await mount(hass);
     $(card, ".bc-opts .btn.ghost").click();
-    await card.updateComplete;
+    await flush();
     expect(hass.published()).toEqual([
       ["clock1/cmd/notify/dismiss", ""],
       ["clock2/cmd/notify/dismiss", ""],

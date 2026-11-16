@@ -12,6 +12,7 @@
   },
   "ignorePatterns": ["dist"],
   "rules": {
+    "curly": ["error", "all"],
     "no-underscore-dangle": "off",
     "vitest/require-mock-type-parameters": "off"
   }

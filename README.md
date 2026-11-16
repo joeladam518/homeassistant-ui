@@ -11,7 +11,7 @@ The repo is public so the shared helpers can be. Only `shared-cards` is licensed
 | [`awtrix-ng-alarm-card`](packages/awtrix-ng-alarm-card/)         | Card, `type: custom:awtrix-ng-alarm-card`     | `dist/awtrix-ng-alarm-card.js`                 | 1.0.0   |
 | [`awtrix-ng-broadcast-card`](packages/awtrix-ng-broadcast-card/) | Card, `type: custom:awtrix-ng-broadcast-card` | `dist/awtrix-ng-broadcast-card.js`             | 1.0.0   |
 | [`rgb-light-card`](packages/rgb-light-card/)                     | Card, `type: custom:rgb-light-card`           | `dist/rgb-light-card.js`                       | 2.0.0   |
-| [`shared-cards`](packages/shared-cards/)                         | Helpers for every card, here and public       | `@joeladam518/shared-cards` on GitHub Packages | 1.0.0   |
+| [`shared-cards`](packages/shared-cards/)                         | Helpers for every card, here and public       | `@joeladam518/shared-cards` on GitHub Packages | 2.0.0   |
 | [`shared-awtrix`](packages/shared-awtrix/)                       | AWTRIX helpers for the AWTRIX cards here      | nothing; bundled into the cards                |         |
 
 ## Develop
@@ -27,7 +27,7 @@ npm run check                              # typecheck, lint, format check, buil
 npm run fmt                                # format everything
 ```
 
-- **Code:** TypeScript + [Lit](https://lit.dev), styles in `*.css` (PostCSS), built with [rolldown](https://rolldown.rs). Each card is one self-contained file with Lit included.
+- **Code:** TypeScript + [Preact](https://preactjs.com) function components (`.tsx`), styles in `*.css` (PostCSS), built with [rolldown](https://rolldown.rs). Each card is one self-contained file with Preact included. `createCardElement` from `shared-cards` wraps a component in the custom element HA loads.
 - **Shared code** is imported by file, e.g. `@joeladam518/shared-cards/toast.ts` or `@joeladam518/shared-awtrix/mqtt.ts`. Here they're workspace links, so changes show up straight away.
 - **CI** only publishes `shared-cards` (see its [README](packages/shared-cards/README.md#release)). Card builds are local.
 
@@ -39,8 +39,8 @@ npm run fmt                                # format everything
 
 ## Add a card
 
-1. Create `packages/<name>/` with a `package.json`: `name`, `version`, `"private": true`, `"license": "UNLICENSED"`, and dependencies on `lit` and `@joeladam518/shared-cards`.
-2. Add `src/index.ts`, which defines the element(s) and calls `registerCard` and `logVersion(…, __VERSION__, …)`.
+1. Create `packages/<name>/` with a `package.json`: `name`, `version`, `"private": true`, `"license": "UNLICENSED"`, and dependencies on `preact` and `@joeladam518/shared-cards`.
+2. Add the card component in `src/card.tsx`, and `src/index.ts`, which defines the element(s) with `createCardElement` and calls `registerCard` and `logVersion(…, __VERSION__, …)`.
 3. Run `npm install`. The build, typecheck, lint and tests pick it up automatically.
 
 ## License

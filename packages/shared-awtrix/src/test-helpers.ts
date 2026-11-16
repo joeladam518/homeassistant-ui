@@ -36,7 +36,9 @@ export function fakeHass(states: FakeHass["states"] = {}, { admin = true } = {})
     locale: { language: "en-US", time_format: "24" },
     connection: {
       subscribeMessage: vi.fn((cb: (m: MqttMessage) => void, msg: { topic: string }) => {
-        if (!admin) return Promise.reject({ code: "unauthorized", message: "Unauthorized" });
+        if (!admin) {
+          return Promise.reject({ code: "unauthorized", message: "Unauthorized" });
+        }
         const sub = { topic: msg.topic, cb };
         subs.push(sub);
         return Promise.resolve(() => subs.splice(subs.indexOf(sub), 1));
@@ -46,7 +48,9 @@ export function fakeHass(states: FakeHass["states"] = {}, { admin = true } = {})
     callWS: vi.fn() as HomeAssistant["callWS"],
     mqtt(topic: string, payload: unknown) {
       const text = typeof payload === "string" ? payload : JSON.stringify(payload);
-      for (const s of subs.filter((x) => matches(x.topic, topic))) s.cb({ topic, payload: text });
+      for (const s of subs.filter((x) => matches(x.topic, topic))) {
+        s.cb({ topic, payload: text });
+      }
     },
     published: () =>
       callService.mock.calls

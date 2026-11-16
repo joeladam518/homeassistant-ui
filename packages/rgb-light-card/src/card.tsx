@@ -4,6 +4,7 @@ import { useNow } from "@joeladam518/shared-cards/hooks.ts";
 import { fireMoreInfo } from "@joeladam518/shared-cards/more-info.ts";
 import { useToast } from "@joeladam518/shared-cards/toast.tsx";
 import type { EntityState, HomeAssistant, LovelaceCardConfig } from "@joeladam518/shared-cards/types.ts";
+import type { FunctionComponent as FC } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 import {
@@ -63,7 +64,7 @@ const isUnavailable = (s: EntityState | undefined): boolean =>
  * A colour light with a drag-to-pick colour wheel, a brightness slider, favourite colours,
  * effects, extra switches (e.g. a "Twinkle" mode) and button inputs (e.g. Shelly inputs).
  */
-export function RgbLightCard({ config: c, hass, host }: CardProps<Config>) {
+export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) => {
   /** Where the user is dragging on the wheel; the marker follows it instead of the light. */
   const [dragHs, setDragHs] = useState<[number, number] | null>(null);
   /** The brightness slider value while the user is using it. */
@@ -324,7 +325,7 @@ export function RgbLightCard({ config: c, hass, host }: CardProps<Config>) {
       {toast}
     </ha-card>
   );
-}
+};
 
 interface RowProps {
   entityRef: EntityRef;
@@ -332,7 +333,7 @@ interface RowProps {
   host: HTMLElement;
 }
 
-function SwitchRow({ entityRef, hass, host }: RowProps) {
+const SwitchRow: FC<RowProps> = ({ entityRef, hass, host }) => {
   const id = refId(entityRef);
   const s = hass.states[id];
   const icon = (typeof entityRef === "object" && entityRef.icon) || "mdi:shimmer";
@@ -353,9 +354,9 @@ function SwitchRow({ entityRef, hass, host }: RowProps) {
       </button>
     </div>
   );
-}
+};
 
-function InputButton({ entityRef, index, hass, host }: RowProps & { index: number }) {
+const InputButton: FC<RowProps & { index: number }> = ({ entityRef, index, hass, host }) => {
   const id = refId(entityRef);
   const s = hass.states[id];
   const type = s?.attributes?.event_type as string | undefined;
@@ -371,7 +372,7 @@ function InputButton({ entityRef, index, hass, host }: RowProps & { index: numbe
       </span>
     </button>
   );
-}
+};
 
 export const RgbLightCardElement = createCardElement(RgbLightCard, {
   styles: [baseCss, switchCss, toastCss, cardCss],

@@ -17,7 +17,9 @@ const packages = readdirSync(new URL("./packages", import.meta.url))
   .filter((dir) => existsSync(new URL(`./packages/${dir}/src/index.ts`, import.meta.url)))
   .filter((dir) => !only || dir === only);
 
-if (only && !packages.length) throw new Error(`No package "${only}" with a src/index.ts in packages/`);
+if (only && !packages.length) {
+  throw new Error(`No package "${only}" with a src/index.ts in packages/`);
+}
 
 export default defineConfig(
   packages.map((dir): RolldownOptions => {

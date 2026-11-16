@@ -3,7 +3,9 @@ import { hsToRgb } from "./color.ts";
 /** Paints a hue (angle) × saturation (radius) colour wheel, with a soft edge. */
 export function drawWheel(canvas: HTMLCanvasElement): void {
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  if (!ctx) {
+    return;
+  }
   const size = canvas.width;
   const radius = size / 2;
   const img = ctx.createImageData(size, size);
@@ -13,9 +15,13 @@ export function drawWheel(canvas: HTMLCanvasElement): void {
       const dy = y - radius + 0.5;
       const d = Math.hypot(dx, dy);
       const i = (y * size + x) * 4;
-      if (d > radius) continue; // stays transparent
+      if (d > radius) {
+        continue;
+      } // stays transparent
       let h = (Math.atan2(dy, dx) * 180) / Math.PI;
-      if (h < 0) h += 360;
+      if (h < 0) {
+        h += 360;
+      }
       const [r, g, b] = hsToRgb(h, (d / radius) * 100);
       img.data[i] = r;
       img.data[i + 1] = g;
@@ -33,7 +39,9 @@ export function pointerHs(ev: PointerEvent, wheel: HTMLElement): [number, number
   const y = ev.clientY - r.top - r.height / 2;
   const dist = Math.min(1, Math.hypot(x, y) / (r.width / 2));
   let h = (Math.atan2(y, x) * 180) / Math.PI;
-  if (h < 0) h += 360;
+  if (h < 0) {
+    h += 360;
+  }
   return [h, dist * 100];
 }
 

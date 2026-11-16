@@ -1,12 +1,13 @@
 {
   "name": "@joeladam518/shared-cards",
-  "version": "1.0.0",
-  "description": "Helpers and styles shared by Joel's Home Assistant cards: card registration, HA types, formatting, sparklines, statistics, toasts and switch styles.",
+  "version": "2.0.0",
+  "description": "Helpers and styles shared by Joel's Home Assistant cards: Preact card/editor wrappers, hooks, toasts, HA types, formatting, sparklines, statistics and switch styles.",
   "keywords": [
     "card",
     "dashboard",
     "home-assistant",
-    "lovelace"
+    "lovelace",
+    "preact"
   ],
   "license": "MIT",
   "author": "Joel Haker",
@@ -28,7 +29,7 @@
   },
   "peerDependencies": {
     "home-assistant-js-websocket": "^9.8.1",
-    "lit": "^3.3.3"
+    "preact": "^11.2.0"
   },
   "peerDependenciesMeta": {
     "home-assistant-js-websocket": {

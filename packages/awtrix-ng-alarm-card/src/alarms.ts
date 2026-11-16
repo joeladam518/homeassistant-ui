@@ -22,7 +22,9 @@ export function parseAlarms(s: string | null | undefined): Alarm[] {
     .filter(Boolean)
     .map((x): Alarm | null => {
       const [t = "", d = "", on = "1"] = x.split(":");
-      if (!/^\d{4}$/.test(t)) return null;
+      if (!/^\d{4}$/.test(t)) {
+        return null;
+      }
       const days = [...new Set(d.split("").filter((c) => /[1-7]/.test(c)))].toSorted().join("");
       return { t, d: days, on: on !== "0" };
     })
@@ -38,9 +40,15 @@ export function serializeAlarms(list: Alarm[]): string {
 
 /** "Every day", "Weekdays", "Weekends" or "Mo, We, Fr". */
 export function daysSummary(d: string): string {
-  if (d === "1234567") return "Every day";
-  if (d === "12345") return "Weekdays";
-  if (d === "67") return "Weekends";
+  if (d === "1234567") {
+    return "Every day";
+  }
+  if (d === "12345") {
+    return "Weekdays";
+  }
+  if (d === "67") {
+    return "Weekends";
+  }
   return d
     .split("")
     .map((n) => DAY_LABELS[Number(n) - 1])
@@ -69,7 +77,9 @@ export function nextAlarm(
         Number(alarm.t.slice(0, 2)),
         Number(alarm.t.slice(2)),
       );
-      if (at > now) return { at, alarm, daysAhead: add };
+      if (at > now) {
+        return { at, alarm, daysAhead: add };
+      }
     }
   }
   return null;
@@ -79,6 +89,8 @@ export function nextAlarm(
 export function formatAlarmTime(t: string, use12h: boolean): { time: string; ampm?: string } {
   const h = Number(t.slice(0, 2));
   const m = t.slice(2);
-  if (!use12h) return { time: `${String(h).padStart(2, "0")}:${m}` };
+  if (!use12h) {
+    return { time: `${String(h).padStart(2, "0")}:${m}` };
+  }
   return { time: `${((h + 11) % 12) + 1}:${m}`, ampm: h < 12 ? "AM" : "PM" };
 }

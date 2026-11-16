@@ -1,7 +1,8 @@
 import { entity, type FakeHass, fakeHass } from "@joeladam518/shared-awtrix/test-helpers.ts";
+import { act, flush } from "@joeladam518/shared-cards/testing.ts";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { AwtrixNgAlarmCard } from "./alarm-card.ts";
+import type { AwtrixNgAlarmCardElement as AwtrixNgAlarmCard } from "./alarm-card.tsx";
 
 beforeAll(async () => {
   await import("./index.ts");
@@ -20,10 +21,11 @@ const states = (alarms = "0730:12345:1,0900:67:0", sound = "Beep") => ({
 
 async function mount(hass: FakeHass): Promise<AwtrixNgAlarmCard> {
   const card = document.createElement("awtrix-ng-alarm-card") as AwtrixNgAlarmCard;
-  card.setConfig({ type: "custom:awtrix-ng-alarm-card", title: "Bedroom alarm" });
-  card.hass = hass;
-  document.body.append(card);
-  await card.updateComplete;
+  await act(() => {
+    card.setConfig({ type: "custom:awtrix-ng-alarm-card", title: "Bedroom alarm" });
+    card.hass = hass;
+    document.body.append(card);
+  });
   return card;
 }
 
@@ -55,7 +57,7 @@ describe("awtrix-ng-alarm-card", () => {
     $<HTMLInputElement>(card, "#addTime").value = "06:15";
     $<HTMLSelectElement>(card, "#addDays").value = "67";
     $(card, ".add .btn").click();
-    await card.updateComplete;
+    await flush();
     expect(setValueCall(hass)).toEqual({
       entity_id: "input_text.tc002_alarms",
       value: "0615:67:1,0730:12345:1,0900:67:0",
@@ -70,7 +72,7 @@ describe("awtrix-ng-alarm-card", () => {
     $<HTMLInputElement>(card, "#addTime").value = "07:30";
     $<HTMLSelectElement>(card, "#addDays").value = "12345";
     $(card, ".add .btn").click();
-    await card.updateComplete;
+    await flush();
     expect(setValueCall(hass)).toBeUndefined();
     expect(clean($(card, ".toast").textContent)).toBe("That alarm already exists");
   });
@@ -86,10 +88,10 @@ describe("awtrix-ng-alarm-card", () => {
 
     const del = () => $$(card, ".alarm")[1]!.querySelector<HTMLElement>(".del")!;
     del().click();
-    await card.updateComplete;
+    await flush();
     expect(clean(del().textContent)).toBe("Delete?");
     del().click();
-    await card.updateComplete;
+    await flush();
     expect($$(card, ".alarm")).toHaveLength(1);
   });
 

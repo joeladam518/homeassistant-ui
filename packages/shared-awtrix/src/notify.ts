@@ -36,13 +36,25 @@ export function buildNotify({
   sound,
 }: NotifyOptions): Record<string, unknown> {
   const body: Record<string, unknown> = { text };
-  if (rainbow) Object.assign(body, { textColor: "palette", palette: "Rainbow", paletteSpeed: 0.5 });
-  else body.textColor = color;
-  if (icon) body.icon = String(icon);
-  if (dur < 0) body.hold = true;
-  else body.durationMs = dur;
-  if (effect) body.effect = effect;
-  if (sound) body.sound = "ding";
+  if (rainbow) {
+    Object.assign(body, { textColor: "palette", palette: "Rainbow", paletteSpeed: 0.5 });
+  } else {
+    body.textColor = color;
+  }
+  if (icon) {
+    body.icon = String(icon);
+  }
+  if (dur < 0) {
+    body.hold = true;
+  } else {
+    body.durationMs = dur;
+  }
+  if (effect) {
+    body.effect = effect;
+  }
+  if (sound) {
+    body.sound = "ding";
+  }
   return body;
 }
 
