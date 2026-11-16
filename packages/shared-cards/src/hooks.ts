@@ -30,7 +30,8 @@ export function heldValue(
   key: string,
   value: unknown,
 ): string | undefined {
-  const focused = root?.activeElement as HTMLElement | null | undefined;
+  // `:focus` rather than `activeElement`: the same answer, and it works in every test DOM too.
+  const focused = (root as ParentNode | null)?.querySelector<HTMLElement>(":focus");
   if (value == null || focused?.dataset?.k === key) {
     return undefined;
   }

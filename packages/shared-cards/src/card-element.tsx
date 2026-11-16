@@ -1,3 +1,4 @@
+/** @jsxImportSource preact */
 import { type ComponentType, render } from "preact";
 
 export { haProps } from "./ha-elements.ts";
