@@ -7,6 +7,6 @@
   "type": "module",
   "dependencies": {
     "@joeladam518/shared-cards": "*",
-    "lit": "^3.3.3"
+    "preact": "^11.2.0"
   }
 }

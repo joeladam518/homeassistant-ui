@@ -1,8 +1,8 @@
 import { defineOnce, logVersion, registerCard } from "@joeladam518/shared-cards/register.ts";
 
-import { RgbLightCard } from "./card.ts";
+import { RgbLightCardElement } from "./card.tsx";
 
-defineOnce("rgb-light-card", RgbLightCard);
+defineOnce("rgb-light-card", RgbLightCardElement);
 
 registerCard({
   type: "rgb-light-card",

@@ -1,7 +1,8 @@
+import { flush } from "@joeladam518/shared-cards/testing.ts";
 import type { HomeAssistant } from "@joeladam518/shared-cards/types.ts";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
-import type { RgbLightCard } from "./card.ts";
+import type { RgbLightCardElement as RgbLightCard } from "./card.tsx";
 
 beforeAll(async () => {
   await import("./index.ts");
@@ -53,7 +54,7 @@ async function mount(config: Record<string, unknown> = {}, hass = fakeHass()): P
   card.setConfig({ type: "custom:rgb-light-card", entity: "light.tree", ...config });
   card.hass = hass;
   document.body.append(card);
-  await card.updateComplete;
+  await flush();
   return card;
 }
 
@@ -109,7 +110,7 @@ describe("rgb-light-card", () => {
     const slider = $<HTMLInputElement>(card, "input[type=range]");
     slider.value = "80";
     slider.dispatchEvent(new Event("input"));
-    await card.updateComplete;
+    await flush();
     expect(clean($(card, ".val").textContent)).toBe("80%");
     slider.dispatchEvent(new Event("change"));
     expect(hass.callService).toHaveBeenCalledWith("light", "turn_on", {
@@ -130,9 +131,10 @@ describe("rgb-light-card", () => {
     expect(clean($(card, ".row-name").textContent)).toBe("Twinkle");
     $(card, ".row .switch").click();
     expect(hass.callService).toHaveBeenCalledWith("homeassistant", "toggle", { entity_id: "switch.twinkle" });
-    expect($$(card, ".input").map((b) => clean(b.textContent))).toEqual([
-      "Button Double press · 5m ago",
-      "Input 2 No presses yet",
+    const inputs = $$(card, ".input").map((b) => [...b.children].map((c) => clean(c.textContent)));
+    expect(inputs).toEqual([
+      ["Button", "Double press · 5m ago"],
+      ["Input 2", "No presses yet"],
     ]);
   });
 
