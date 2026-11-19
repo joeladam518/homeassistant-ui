@@ -2,8 +2,13 @@ export type Rgb = [number, number, number];
 
 export interface Favorite {
   name: string;
-  /** "#RRGGBB", or "white" for the white LEDs on RGBW / RGBWW lights. */
+  /** What's sent to the light: "#RRGGBB", or "white" for the white LEDs on RGBW / RGBWW lights. */
   color: string;
+  /**
+   * Optional. What the card shows for it ("#RRGGBB"), for when the colour you send doesn't look
+   * the same on screen as it does on the light. Defaults to `color`.
+   */
+  displayColor?: string;
 }
 
 export const DEFAULT_FAVORITES: Favorite[] = [
@@ -61,9 +66,13 @@ export function rgbToHs([r, g, b]: Rgb): [number, number] {
   return [h, max ? (d / max) * 100 : 0];
 }
 
-/** The swatch colour for a favourite. */
+/** The `displayColor` of a favourite, if it has a valid one. */
+export const favoriteDisplayRgb = (f: Favorite): Rgb | null =>
+  f.displayColor ? hexToRgb(f.displayColor) : null;
+
+/** The swatch colour for a favourite: its `displayColor`, else its `color`. */
 export const favoriteRgb = (f: Favorite): Rgb =>
-  isWhiteFavorite(f) ? [255, 255, 255] : (hexToRgb(f.color) ?? [255, 255, 255]);
+  favoriteDisplayRgb(f) ?? (isWhiteFavorite(f) ? [255, 255, 255] : (hexToRgb(f.color) ?? [255, 255, 255]));
 
 /** Is the light showing this favourite? Colours match when hue and saturation are close. */
 export function favoriteMatches(f: Favorite, current: Rgb | "white" | null): boolean {

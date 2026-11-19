@@ -10,7 +10,7 @@ The repo is public so the shared helpers can be. Only `shared-cards` is licensed
 | ---------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------- | ------- |
 | [`awtrix-ng-alarm-card`](packages/awtrix-ng-alarm-card/)         | Card, `type: custom:awtrix-ng-alarm-card`     | `dist/awtrix-ng-alarm-card.js`                 | 1.1.0   |
 | [`awtrix-ng-broadcast-card`](packages/awtrix-ng-broadcast-card/) | Card, `type: custom:awtrix-ng-broadcast-card` | `dist/awtrix-ng-broadcast-card.js`             | 1.1.0   |
-| [`rgb-light-card`](packages/rgb-light-card/)                     | Card, `type: custom:rgb-light-card`           | `dist/rgb-light-card.js`                       | 2.1.0   |
+| [`rgb-light-card`](packages/rgb-light-card/)                     | Card, `type: custom:rgb-light-card`           | `dist/rgb-light-card.js`                       | 2.3.0   |
 | [`shared-cards`](packages/shared-cards/)                         | Helpers for every card, here and public       | `@joeladam518/shared-cards` on GitHub Packages | 2.0.0   |
 | [`shared-awtrix`](packages/shared-awtrix/)                       | AWTRIX helpers for the AWTRIX cards here      | nothing; bundled into the cards                |         |
 

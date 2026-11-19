@@ -145,6 +145,120 @@ describe("rgb-light-card", () => {
     expect($$(card, ".fav.active").map((b) => b.title)).toEqual(["White"]);
   });
 
+  it("shows a white slider only on RGBW lights", async () => {
+    const rgbw = await mount({}, fakeHass({ rgbw_color: [255, 0, 0, 102] }));
+    const slider = $<HTMLInputElement>(rgbw, '.white input[type="range"]');
+    expect(slider.value).toBe("40");
+    expect(clean($(rgbw, ".white .val").textContent)).toBe("40%");
+
+    const rgb = await mount(
+      {},
+      fakeHass({ supported_color_modes: ["rgb"], color_mode: "rgb", rgbw_color: undefined }),
+    );
+    expect($$(rgb, ".white")).toEqual([]);
+  });
+
+  it("sets the white LEDs and keeps the colour", async () => {
+    const hass = fakeHass({ rgbw_color: [0, 0, 255, 0], rgb_color: [0, 0, 255] });
+    const card = await mount({}, hass);
+    const slider = $<HTMLInputElement>(card, '.white input[type="range"]');
+    slider.value = "50";
+    slider.dispatchEvent(new Event("change"));
+    expect(hass.callService).toHaveBeenCalledWith("light", "turn_on", {
+      entity_id: "light.tree",
+      rgbw_color: [0, 0, 255, 128],
+    });
+  });
+
+  it("keeps the white level when picking a colour, and the favourite still matches", async () => {
+    // HA blends the white into rgb_color; the card should go by the colour channels.
+    const hass = fakeHass({ rgbw_color: [255, 0, 0, 128], rgb_color: [255, 128, 128] });
+    const card = await mount({}, hass);
+    expect($$(card, ".fav.active").map((b) => b.title)).toEqual(["Red"]);
+    $(card, '.fav[title="Blue"]').click();
+    expect(hass.callService).toHaveBeenCalledWith("light", "turn_on", {
+      entity_id: "light.tree",
+      rgbw_color: [0, 0, 255, 128],
+    });
+  });
+
+  it("switches from white-only to the pure colour", async () => {
+    const hass = fakeHass({ rgbw_color: [0, 0, 0, 255], rgb_color: [255, 255, 255] });
+    const card = await mount({}, hass);
+    $(card, '.fav[title="Green"]').click();
+    expect(hass.callService).toHaveBeenCalledWith("light", "turn_on", {
+      entity_id: "light.tree",
+      rgbw_color: [0, 255, 0, 0],
+    });
+  });
+
+  it("turns off when white goes to 0 with no colour", async () => {
+    const hass = fakeHass({ rgbw_color: [0, 0, 0, 255], rgb_color: [255, 255, 255] });
+    const card = await mount({}, hass);
+    const slider = $<HTMLInputElement>(card, '.white input[type="range"]');
+    slider.value = "0";
+    slider.dispatchEvent(new Event("change"));
+    expect(hass.callService).toHaveBeenCalledWith("light", "turn_off", { entity_id: "light.tree" });
+  });
+
+  it("fades over `transition` seconds when the light supports it", async () => {
+    const hass = fakeHass({ supported_features: 32 });
+    const card = await mount({ transition: 2 }, hass);
+    $(card, '.fav[title="Blue"]').click();
+    expect(hass.callService).toHaveBeenCalledWith("light", "turn_on", {
+      entity_id: "light.tree",
+      rgbw_color: [0, 0, 255, 0],
+      transition: 2,
+    });
+    $(card, ".switch.big").click();
+    expect(hass.callService).toHaveBeenCalledWith("light", "toggle", {
+      entity_id: "light.tree",
+      transition: 2,
+    });
+  });
+
+  it("leaves transition out when the light can't fade", async () => {
+    const hass = fakeHass({ supported_features: 0 });
+    const card = await mount({ transition: 2 }, hass);
+    $(card, '.fav[title="Blue"]').click();
+    expect(hass.callService).toHaveBeenCalledWith("light", "turn_on", {
+      entity_id: "light.tree",
+      rgbw_color: [0, 0, 255, 0],
+    });
+  });
+
+  it("rejects a transition that isn't a number", () => {
+    const card = document.createElement("rgb-light-card") as RgbLightCard;
+    // YAML can hand the card anything
+    const transition = "slow" as unknown as number;
+    expect(() => card.setConfig({ type: "custom:rgb-light-card", entity: "light.tree", transition })).toThrow(
+      /transition/,
+    );
+  });
+
+  it("shows a favourite's displayColor but sends its color", async () => {
+    const hass = fakeHass({ rgbw_color: [0, 0, 255, 0], rgb_color: [0, 0, 255] });
+    const card = await mount(
+      { favorites: [{ name: "Amber", color: "#FF4000", displayColor: "#FFA000" }] },
+      hass,
+    );
+    expect($(card, '.fav[title="Amber"]').style.getPropertyValue("--c")).toBe("rgb(255,160,0)");
+    $(card, '.fav[title="Amber"]').click();
+    expect(hass.callService).toHaveBeenCalledWith("light", "turn_on", {
+      entity_id: "light.tree",
+      rgbw_color: [255, 64, 0, 0],
+    });
+  });
+
+  it("tints the card with the active favourite's displayColor", async () => {
+    const card = await mount(
+      { favorites: [{ name: "Amber", color: "#FF0000", displayColor: "#FFA000" }] },
+      fakeHass({ rgbw_color: [255, 0, 0, 0], rgb_color: [255, 0, 0] }),
+    );
+    expect($$(card, ".fav.active").map((b) => b.title)).toEqual(["Amber"]);
+    expect($(card, "ha-card").style.getPropertyValue("--light")).toBe("rgb(255,160,0)");
+  });
+
   it("shows a toast when the light rejects a command", async () => {
     const hass = fakeHass();
     hass.callService = vi.fn(() => Promise.reject(new Error("Light is offline")));

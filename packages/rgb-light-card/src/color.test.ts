@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_FAVORITES, favoriteMatches, hexToRgb, hsToRgb, rgbToHs } from "./color.ts";
+import { DEFAULT_FAVORITES, favoriteMatches, favoriteRgb, hexToRgb, hsToRgb, rgbToHs } from "./color.ts";
 
 const fav = (name: string) => DEFAULT_FAVORITES.find((f) => f.name === name)!;
 
@@ -17,6 +17,18 @@ describe("colour maths", () => {
     const [h, s] = rgbToHs([0, 255, 255]);
     expect(h).toBeCloseTo(180);
     expect(s).toBeCloseTo(100);
+  });
+});
+
+describe("favoriteRgb", () => {
+  it("shows displayColor when set, else color", () => {
+    expect(favoriteRgb({ name: "Amber", color: "#FF4000", displayColor: "#FFA000" })).toEqual([255, 160, 0]);
+    expect(favoriteRgb({ name: "Amber", color: "#FF4000" })).toEqual([255, 64, 0]);
+    expect(favoriteRgb({ name: "Warm", color: "white", displayColor: "#FFF4E5" })).toEqual([255, 244, 229]);
+  });
+
+  it("falls back to color when displayColor isn't a hex colour", () => {
+    expect(favoriteRgb({ name: "Amber", color: "#FF4000", displayColor: "amber" })).toEqual([255, 64, 0]);
   });
 });
 

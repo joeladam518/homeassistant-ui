@@ -10,12 +10,14 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import {
   DEFAULT_FAVORITES,
   type Favorite,
+  favoriteDisplayRgb,
   favoriteMatches,
   favoriteRgb,
   hexToRgb,
   hsToRgb,
   isWhiteFavorite,
   type Rgb,
+  rgbToHs,
 } from "./color.ts";
 import { drawWheel, markerPosition, pointerHs } from "./wheel.ts";
 
@@ -39,6 +41,8 @@ export interface RgbLightCardConfig extends LovelaceCardConfig {
   hide_effects?: string[];
   /** Favourite colours; defaults to nine. */
   favorites?: Favorite[];
+  /** Fade time in seconds for every change (on, off, colour, brightness). Off by default. */
+  transition?: number;
 }
 
 type Config = RgbLightCardConfig & { favorites: Favorite[] };
@@ -51,6 +55,9 @@ const EVENT_LABELS: Record<string, string> = {
   btn_down: "Pressed",
   btn_up: "Released",
 };
+
+/** `supported_features` bit for lights that can fade (LightEntityFeature.TRANSITION). */
+const SUPPORTS_TRANSITION = 32;
 
 /** Colour updates while dragging go out at most this often. */
 const DRAG_SEND_MS = 350;
@@ -67,8 +74,6 @@ const isUnavailable = (s: EntityState | undefined): boolean =>
 export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) => {
   /** Where the user is dragging on the wheel; the marker follows it instead of the light. */
   const [dragHs, setDragHs] = useState<[number, number] | null>(null);
-  /** The brightness slider value while the user is using it. */
-  const [briDraft, setBriDraft] = useState<number | null>(null);
   const dragging = useRef(false);
   const lastSend = useRef(0);
   const dragEndTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -88,23 +93,43 @@ export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) =
   useEffect(() => () => clearTimeout(dragEndTimer.current), []);
 
   const st = hass.states[c.entity];
-  const modes = (st?.attributes?.supported_color_modes as string[] | undefined) || [];
+  const a = st?.attributes ?? {};
+  const modes = (a.supported_color_modes as string[] | undefined) || [];
+  const on = st?.state === "on";
+  const unavailable = !!st && isUnavailable(st);
+
+  // On an RGBW light, HA's rgb_color blends the white LEDs in. Use the colour channels alone,
+  // so the marker and favourites don't move when white is added.
+  const rgbw = a.color_mode === "rgbw" ? (a.rgbw_color as number[] | undefined) : undefined;
+  const colorRgb = rgbw ? (rgbw.slice(0, 3) as Rgb) : (a.rgb_color as Rgb | undefined);
+  /** The white LEDs, 0–255. */
+  const white = on && rgbw ? rgbw[3]! : 0;
+  /** On the white LEDs only, no colour. */
+  const isWhite =
+    on && ((!!rgbw && white > 0 && Math.max(...rgbw.slice(0, 3)) < 30) || a.color_mode === "white");
 
   /* --------------------------------------------------------- actions */
 
-  const turnOn = (data: Record<string, unknown>): void => {
+  const canFade = !!c.transition && (Number(a.supported_features) & SUPPORTS_TRANSITION) !== 0;
+
+  /** Calls a light service, with the fade time if set. `live` (dragging) never fades: it would lag. */
+  const callLight = (service: string, data: Record<string, unknown> = {}, live = false): void => {
+    const fade = canFade && !live ? { transition: Number(c.transition) } : {};
     hass
-      .callService("light", "turn_on", { entity_id: c.entity, ...data })
+      .callService("light", service, { entity_id: c.entity, ...data, ...fade })
       .catch((e: unknown) => showToast((e as Error)?.message || "That didn't work"));
   };
 
-  const setColor = (rgb: Rgb): void => {
+  const turnOn = (data: Record<string, unknown>, live = false): void => callLight("turn_on", data, live);
+
+  const setColor = (rgb: Rgb, live = false): void => {
     if (modes.includes("rgbw")) {
-      turnOn({ rgbw_color: [...rgb, 0] });
+      // Keep the white level, unless the light is on white only: then switch to the colour.
+      turnOn({ rgbw_color: [...rgb, isWhite ? 0 : white] }, live);
     } else if (modes.includes("rgbww")) {
-      turnOn({ rgbww_color: [...rgb, 0, 0] });
+      turnOn({ rgbww_color: [...rgb, 0, 0] }, live);
     } else {
-      turnOn({ rgb_color: rgb });
+      turnOn({ rgb_color: rgb }, live);
     }
   };
 
@@ -120,9 +145,21 @@ export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) =
     }
   };
 
+  /** The white LEDs on an RGBW light, keeping the colour channels as they are. */
+  const setWhiteLevel = (pct: number): void => {
+    const w = Math.round((pct / 100) * 255);
+    const keep: Rgb = on && colorRgb ? colorRgb : [0, 0, 0];
+    if (w === 0 && Math.max(...keep) === 0) {
+      // nothing left lit
+      callLight("turn_off");
+      return;
+    }
+    turnOn({ rgbw_color: [...keep, w] });
+  };
+
   const toggle = (e: Event): void => {
     e.stopPropagation();
-    void hass.callService("light", "toggle", { entity_id: c.entity });
+    callLight("toggle");
   };
 
   const pick = (ev: PointerEvent, final: boolean): void => {
@@ -131,7 +168,7 @@ export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) =
     const now = Date.now();
     if (final || now - lastSend.current > DRAG_SEND_MS) {
       lastSend.current = now;
-      setColor(hsToRgb(h, s));
+      setColor(hsToRgb(h, s), !final);
     }
   };
 
@@ -173,20 +210,16 @@ export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) =
 
   /* ---------------------------------------------------------- render */
 
-  const a = st?.attributes ?? {};
-  const on = st?.state === "on";
-  const unavailable = !!st && isUnavailable(st);
-
-  const rgbw = a.rgbw_color as number[] | undefined;
-  const isWhite =
-    on &&
-    ((a.color_mode === "rgbw" && !!rgbw && rgbw[3]! > 0 && Math.max(...rgbw.slice(0, 3)) < 30) ||
-      a.color_mode === "white");
-  const hs = a.hs_color as [number, number] | undefined;
+  const hs = rgbw ? rgbToHs(rgbw.slice(0, 3) as Rgb) : (a.hs_color as [number, number] | undefined);
+  const current: Rgb | "white" | null = on ? (isWhite ? "white" : (colorRgb ?? null)) : null;
+  /** The favourite the light is showing, if any. */
+  const active = c.favorites.find((f) => favoriteMatches(f, current));
+  // Tint the card with the favourite's displayColor, if it has one: that's what the light looks like.
   const rgb: Rgb = on
-    ? isWhite
-      ? [255, 244, 229]
-      : (a.rgb_color as Rgb | undefined) || (hs ? hsToRgb(hs[0], hs[1]) : [255, 255, 255])
+    ? ((active && favoriteDisplayRgb(active)) ??
+      (isWhite
+        ? [255, 244, 229]
+        : (a.rgb_color as Rgb | undefined) || (hs ? hsToRgb(hs[0], hs[1]) : [255, 255, 255])))
     : [140, 140, 140];
 
   const pct = on && a.brightness != null ? Math.round((Number(a.brightness) / 255) * 100) : null;
@@ -200,17 +233,11 @@ export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) =
         : "Off";
 
   const [mh, ms] = dragHs ?? (on && hs && !isWhite ? hs : [0, 0]);
-  const current: Rgb | "white" | null = on
-    ? isWhite
-      ? "white"
-      : ((a.rgb_color as Rgb | undefined) ?? null)
-    : null;
 
   const hidden = new Set((c.hide_effects || []).map((x) => String(x).toLowerCase()));
   const effects = ((a.effect_list as string[] | undefined) || []).filter(
     (e) => e && !hidden.has(String(e).toLowerCase()),
   );
-  const bri = briDraft ?? pct ?? 0;
 
   return (
     <ha-card
@@ -258,28 +285,33 @@ export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) =
         </div>
       </div>
 
-      <div class="bri">
-        <ha-icon icon="mdi:brightness-6" />
-        <input
-          type="range"
-          min={1}
-          max={100}
-          step={1}
-          aria-label="Brightness"
-          value={String(bri)}
+      <Level
+        kind="bri"
+        icon="mdi:brightness-6"
+        label="Brightness"
+        min={1}
+        value={pct}
+        disabled={unavailable}
+        onSet={(v) => turnOn({ brightness_pct: v })}
+      />
+
+      {modes.includes("rgbw") && (
+        <Level
+          kind="white"
+          icon="mdi:white-balance-sunny"
+          label="White"
+          min={0}
+          value={on ? Math.round((white / 255) * 100) : null}
           disabled={unavailable}
-          onInput={(e) => setBriDraft(Number(e.currentTarget.value))}
-          onChange={(e) => turnOn({ brightness_pct: Number(e.currentTarget.value) })}
-          onBlur={() => setBriDraft(null)}
+          onSet={setWhiteLevel}
         />
-        <span class="val">{briDraft != null ? `${briDraft}%` : pct != null ? `${pct}%` : "–"}</span>
-      </div>
+      )}
 
       <div class="favs">
         {c.favorites.map((f) => (
           <button
             key={f.name}
-            class={`fav ${favoriteMatches(f, current) ? "active" : ""}`}
+            class={`fav ${f === active ? "active" : ""}`}
             title={f.name}
             aria-label={f.name}
             style={{ "--c": `rgb(${favoriteRgb(f).join(",")})` }}
@@ -324,6 +356,44 @@ export const RgbLightCard: FC<CardProps<Config>> = ({ config: c, hass, host }) =
 
       {toast}
     </ha-card>
+  );
+};
+
+interface LevelProps {
+  /** The CSS class: `bri` or `white`. */
+  kind: string;
+  icon: string;
+  label: string;
+  min: number;
+  /** The light's value in %, or null when it has none (e.g. off). */
+  value: number | null;
+  disabled: boolean;
+  /** Called with the new % when the user lets go. */
+  onSet: (pct: number) => void;
+}
+
+/** A 0–100% slider that holds the user's value while they drag. */
+const Level: FC<LevelProps> = ({ kind, icon, label, min, value, disabled, onSet }) => {
+  const [draft, setDraft] = useState<number | null>(null);
+  const shown = draft ?? value;
+
+  return (
+    <div class={`level ${kind}`}>
+      <ha-icon icon={icon} />
+      <input
+        type="range"
+        min={min}
+        max={100}
+        step={1}
+        aria-label={label}
+        value={String(shown ?? 0)}
+        disabled={disabled}
+        onInput={(e) => setDraft(Number(e.currentTarget.value))}
+        onChange={(e) => onSet(Number(e.currentTarget.value))}
+        onBlur={() => setDraft(null)}
+      />
+      <span class="val">{shown != null ? `${shown}%` : "–"}</span>
+    </div>
   );
 };
 
@@ -379,6 +449,9 @@ export const RgbLightCardElement = createCardElement(RgbLightCard, {
   config: (config: RgbLightCardConfig): Config => {
     if (!config?.entity) {
       throw new Error("Set 'entity' to a color light");
+    }
+    if (config.transition != null && !(Number(config.transition) >= 0)) {
+      throw new Error("Set 'transition' to a number of seconds, e.g. 2");
     }
     return { ...config, favorites: config.favorites ?? DEFAULT_FAVORITES };
   },
